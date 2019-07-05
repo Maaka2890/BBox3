@@ -1,0 +1,47 @@
+# This file contains metadata for your plugin.
+
+# This file should be included when you package your plugin.# Mandatory items:
+
+[general]
+name=Get Bounding Box
+qgisMinimumVersion=3.0
+description=This plugin returns the xmin, ymin, xmax, ymax of the current view window, and the GetMap request of the selected WMS. 
+version=0.1
+author=Maaka2890
+email=kkj_15@hotmail.com
+
+about=Developers of web services often need bounding boxes of specific areas during trouble shooting, for test calls or for communication. The goal of this plugin is to, with one click, provide the bounding box of the current view window and the GetMap request of the selected WMS. You can copy this for your tests. With this plugin you can pan to a new location and press "Get BBOX" to updated the bounding box and GetMap request. Making it the quickest way of getting the needed information. No more need for different software, python commands, or copying xmin, ymin etc. one by one. Your bounding box is only 2 clicks away. Note that, in this plugin, the order will be xmin, ymin, xmax, ymax. This corresponds to the gml simple features point geometry encoding. Depending on the EPSG code you might need ymin, xmin, ymax, xmax in your tests. The GetMap request only works if you use the U.S. English Qgis. The script searches metadata therms which, when translated, can't be found.
+
+tracker=https://github.com/Maaka2890/BBox3/issues
+repository=https://github.com/Maaka2890/BBox3
+# End of mandatory metadata
+
+# Recommended items:
+
+hasProcessingProvider=no
+# Uncomment the following line and add your changelog:
+# changelog=
+
+# Tags are comma separated with spaces allowed
+tags=bounding box, extent, bbox
+
+homepage=https://github.com/Maaka2890/BBox3
+category=Web
+icon=icon.png
+# experimental flag
+experimental=False
+
+# deprecated flag (applies to the whole plugin, not just a single version)
+deprecated=False
+
+# Since QGIS 3.8, a comma separated list of plugins to be installed
+# (or upgraded) can be specified.
+# Check the documentation for more information.
+# plugin_dependencies=
+
+Category of the plugin: Raster, Vector, Database or Web
+# category=
+
+# If the plugin can run on QGIS Server.
+server=False
+
