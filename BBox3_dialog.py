@@ -21,8 +21,13 @@
  *                                                                         *
  ***************************************************************************/
 """
+from qgis.core import *
+from qgis.gui import *
+from qgis.utils import *
 
 import os
+import sys
+import re
 
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
@@ -42,3 +47,35 @@ class GetBoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
         # http://qt-project.org/doc/qt-4.8/designer-using-a-ui-file.html
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
+        self.GetBB.clicked.connect(self.CalculateBB)
+    def CalculateBB(self):
+        xmin=iface.mapCanvas().extent().xMinimum()
+        xmax=iface.mapCanvas().extent().xMaximum()
+        ymin=iface.mapCanvas().extent().yMinimum()
+        ymax=iface.mapCanvas().extent().yMaximum()
+        bb1= str(xmin) + ","+str(ymin) + "," +str(xmax) + "," +str(ymax)
+        bb=str(bb1)
+        self.textOutput.setText(bb)
+        layer = iface.activeLayer()
+        urlsearch = "<tr><td>GetCapabilitiesUrl</td><td>(.+?)</td>"
+        urlresult = re.search(urlsearch, layer.htmlMetadata())
+        url = urlresult.group(1)
+        versionsearch = "<tr><td>WMS Version</td><td>(.+?)</td>"
+        versionresult = re.search(versionsearch, layer.htmlMetadata())
+        version = versionresult.group(1)
+        crs = iface.activeLayer().crs().authid()
+        crs = re.search('(.*)', crs)
+        crs= crs.group(1)
+        namesearch = "<tr><td>Name</td><td>(.+?)</td>"
+        nameresult = re.search(namesearch, layer.htmlMetadata())
+        name= nameresult.group(1)
+        width=iface.mapCanvas().size().width()
+        width=str(width)
+        height=iface.mapCanvas().size().height()
+        height=str(height)
+        formatsearch = "<tr><td>Image Formats</td><td>(.+?)</td>"
+        formatresult = re.search(formatsearch, layer.htmlMetadata())
+        format = formatresult.group(1)
+        format = format.split('<')[0]
+        getmap= url + "service=WMS&request=GetMap&version="+version +"&BGCOLOR=0xFFFFFF"+"&crs="+crs+"&bbox=" +bb +"&layers=" +name +"&width=" +width +"&height=" +height +"&format=" +format
+        self.textOutput_2.setText(getmap)
