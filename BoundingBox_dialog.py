@@ -59,24 +59,25 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
         layer = iface.activeLayer()
         urlsearch = "<tr><td>GetCapabilitiesUrl</td><td>(.+?)</td>"
         urlresult = re.search(urlsearch, layer.htmlMetadata())
-        url = urlresult.group(1)
-        versionsearch = "<tr><td>WMS Version</td><td>(.+?)</td>"
-        versionresult = re.search(versionsearch, layer.htmlMetadata())
-        version = versionresult.group(1)
-        crs = iface.activeLayer().crs().authid()
-        crs = re.search('(.*)', crs)
-        crs= crs.group(1)
-        namesearch = "<tr><td>Name</td><td>(.+?)</td>"
-        nameresult = re.search(namesearch, layer.htmlMetadata())
-        name= nameresult.group(1)
-        width=iface.mapCanvas().size().width()
-        width=str(width)
-        height=iface.mapCanvas().size().height()
-        height=str(height)
-        formatsearch = "<tr><td>Image Formats</td><td>(.+?)</td>"
-        formatresult = re.search(formatsearch, layer.htmlMetadata())
-        format = formatresult.group(1)
-        format = format.split('<')[0]
-        getmap= url + "service=WMS&request=GetMap&version="+version +"&BGCOLOR=0xFFFFFF"+"&crs="+crs+"&bbox=" +bb +"&layers=" +name +"&width=" +width +"&height=" +height +"&format=" +format
-        self.textOutput_2.setText(getmap)
+        if(urlresult != None):        
+            url = urlresult.group(1)
+            versionsearch = "<tr><td>WMS Version</td><td>(.+?)</td>"
+            versionresult = re.search(versionsearch, layer.htmlMetadata())
+            version = versionresult.group(1)
+            crs = iface.activeLayer().crs().authid()
+            crs = re.search('(.*)', crs)
+            crs= crs.group(1)
+            namesearch = "<tr><td>Name</td><td>(.+?)</td>"
+            nameresult = re.search(namesearch, layer.htmlMetadata())
+            name= nameresult.group(1)
+            width=iface.mapCanvas().size().width()
+            width=str(width)
+            height=iface.mapCanvas().size().height()
+            height=str(height)
+            formatsearch = "<tr><td>Image Formats</td><td>(.+?)</td>"
+            formatresult = re.search(formatsearch, layer.htmlMetadata())
+            format = formatresult.group(1)
+            format = format.split('<')[0]
+            getmap= url + "service=WMS&request=GetMap&version="+version +"&BGCOLOR=0xFFFFFF"+"&crs="+crs+"&bbox=" +bb +"&layers=" +name +"&width=" +width +"&height=" +height +"&format=" +format
+            self.textOutput_2.setText(getmap)
 
