@@ -57,6 +57,12 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
         bb=str(bb1)
         self.textOutput.setText(bb)
         layer = iface.activeLayer()
+
+        # Stop here if the user hasn't selected a layer.
+        if not layer:
+            return
+
+        # The user has selected a layer, try to extract information about it.
         urlsearch = "<tr><td>GetCapabilitiesUrl</td><td>(.+?)</td>"
         urlresult = re.search(urlsearch, layer.htmlMetadata())
         if(urlresult != None):        
