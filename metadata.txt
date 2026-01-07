@@ -20,7 +20,7 @@ repository=https://github.com/Maaka2890/BBox3
 
 hasProcessingProvider=no
 # Uncomment the following line and add your changelog:
-# changelog=
+changelog= Made it ready for Qgis 4. Added a warning when the project crs differs from the wms crs and if so it prints both the constructed and actual GetMap request. Fixed a bug in the constructed GetMap request.
 
 # Tags are comma separated with spaces allowed
 tags=bounding box, bbox, extent
