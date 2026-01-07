@@ -30,8 +30,9 @@ You can change the language by:
 ### GetMap box empty
 It only returns a GetMap request if you select (highlight) the WMS in the Layers Panel. 
 
-### xmin, ymin VS ymin, xmin
-The order will be xmin, ymin, xmax, ymax. This corresponds to the gml simple features point geometry encoding. Depending on the EPSG you might need ymin, xmin, ymax, xmax in your tests.
+### Bounding boxes representation
+The order will be xmin, ymin, xmax, ymax. This corresponds to the gml simple features point geometry encoding. Depending on the software you might need ymin, xmin, ymax, xmax or another order in your tests.  
+cheetsheet: https://github.com/perrygeo/bbox-cheatsheet/blob/master/reference.md
 
 ## Acknowledgments
 

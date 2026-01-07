@@ -9,7 +9,7 @@
         begin                : 2019-07-10
         git sha              : $Format:%H$
         copyright            : (C) 2019 by Maaka2890
-        email                : kkj_15@hotmail.com
+        email                : kkj_15 at hotmail dot com
  ***************************************************************************/
 
 /***************************************************************************
@@ -58,6 +58,9 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
         self.textOutput.setText(bb)
         layer = iface.activeLayer()
 
+        # Clear any previous warning
+        self.warningLabel.setText("")
+
         # Stop here if the user hasn't selected a layer.
         if not layer:
             return
@@ -73,6 +76,14 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
             crs = iface.activeLayer().crs().authid()
             crs = re.search('(.*)', crs)
             crs= crs.group(1)
+            
+            # Get the project CRS
+            project_crs = iface.mapCanvas().mapSettings().destinationCrs().authid()
+            
+            # Check if WMS CRS matches project CRS
+            if crs != project_crs:
+                self.warningLabel.setText(f"⚠ Warning: WMS EPSG ({crs}) does not match Project EPSG ({project_crs})")
+            
             namesearch = "<tr><td>Name</td><td>(.+?)</td>"
             nameresult = re.search(namesearch, layer.htmlMetadata())
             name= nameresult.group(1)
