@@ -6,7 +6,7 @@
 name=BoundingBox
 qgisMinimumVersion=3.2
 description=This plugin returns the xmin, ymin, xmax, ymax of the current view window, and the GetMap request of the selected WMS.
-version=2.2
+version=3.0
 author=Maaka2890
 email=kkj_15 at hotmail dot com
 

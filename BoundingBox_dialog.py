@@ -24,10 +24,12 @@
 from qgis.core import *
 from qgis.gui import *
 from qgis.utils import *
+from qgis.PyQt.QtCore import QUrl
 
 import os
 import sys
 import re
+from urllib.parse import parse_qs, urlparse
 
 from qgis.PyQt import uic
 from qgis.PyQt import QtWidgets
@@ -48,6 +50,30 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
         # #widgets-and-dialogs-with-auto-connect
         self.setupUi(self)
         self.GetBB.clicked.connect(self.CalculateBB)
+        self.last_wms_requests = {}
+        
+        # Connect to network access manager to capture WMS requests
+        nam = QgsNetworkAccessManager.instance()
+        nam.finished.connect(self.captureNetworkReply)
+    
+    def captureNetworkReply(self, reply):
+        """Capture WMS GetMap requests from network replies"""
+        url = reply.request().url().toString()
+        
+        # Check if this is a WMS GetMap request (not GetCapabilities)
+        url_lower = url.lower()
+        if 'service=wms' in url_lower and 'request=getmap' in url_lower:
+            # Parse the URL to extract layer name
+            parsed = urlparse(url)
+            params_dict = parse_qs(parsed.query, keep_blank_values=True)
+            
+            # Store the request URL indexed by layer name (case insensitive)
+            for key, values in params_dict.items():
+                if key.lower() == 'layers' and values:
+                    layer_name = values[0].lower()
+                    self.last_wms_requests[layer_name] = url
+                    break
+
     def CalculateBB(self):
         xmin=iface.mapCanvas().extent().xMinimum()
         xmax=iface.mapCanvas().extent().xMaximum()
@@ -58,8 +84,11 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
         self.textOutput.setText(bb)
         layer = iface.activeLayer()
 
-        # Clear any previous warning
+        # Clear any previous warning and hide additional elements
         self.warningLabel.setText("")
+        self.actualLabel.setVisible(False)
+        self.textOutput_3.setVisible(False)
+        self.setFixedHeight(360)
 
         # Stop here if the user hasn't selected a layer.
         if not layer:
@@ -70,6 +99,13 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
         urlresult = re.search(urlsearch, layer.htmlMetadata())
         if(urlresult != None):        
             url = urlresult.group(1)
+            
+            # Clean the URL - remove any existing query parameters
+            if '?' in url:
+                base_url = url.split('?')[0]
+            else:
+                base_url = url
+            
             versionsearch = "<tr><td>WMS Version</td><td>(.+?)</td>"
             versionresult = re.search(versionsearch, layer.htmlMetadata())
             version = versionresult.group(1)
@@ -78,12 +114,7 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
             crs= crs.group(1)
             
             # Get the project CRS
-            project_crs = iface.mapCanvas().mapSettings().destinationCrs().authid()
-            
-            # Check if WMS CRS matches project CRS
-            if crs != project_crs:
-                self.warningLabel.setText(f"⚠ Warning: WMS EPSG ({crs}) does not match Project EPSG ({project_crs})")
-            
+            project_crs = iface.mapCanvas().mapSettings().destinationCrs().authid()    
             namesearch = "<tr><td>Name</td><td>(.+?)</td>"
             nameresult = re.search(namesearch, layer.htmlMetadata())
             name= nameresult.group(1)
@@ -95,6 +126,26 @@ class BoundingBoxDialog(QtWidgets.QDialog, FORM_CLASS):
             formatresult = re.search(formatsearch, layer.htmlMetadata())
             format = formatresult.group(1)
             format = format.split('<')[0]
-            getmap= url + "service=WMS&request=GetMap&version="+version +"&BGCOLOR=0xFFFFFF"+"&crs="+crs+"&bbox=" +bb +"&layers=" +name +"&width=" +width +"&height=" +height +"&format=" +format
+            getmap= base_url + "?service=WMS&request=GetMap&version="+version +"&BGCOLOR=0xFFFFFF"+"&crs="+project_crs+"&bbox=" +bb +"&layers=" +name +"&styles=&width=" +width +"&height=" +height +"&format=" +format
             self.textOutput_2.setText(getmap)
+            
+            # Check if WMS CRS matches project CRS
+            if crs != project_crs:
+                self.warningLabel.setText(f"⚠ Warning: WMS EPSG ({crs}) does not match Project EPSG ({project_crs})")
+                self.setFixedHeight(550)
+                self.actualLabel.setVisible(True)
+                self.textOutput_3.setVisible(True)
+                
+                # Force a layer refresh to trigger a new network request
+                layer.triggerRepaint()
+                
+                # Try to get the actual request from captured network traffic
+                layer_name_lower = name.lower()
+                
+                if layer_name_lower in self.last_wms_requests:
+                    # Display the captured network request directly
+                    self.textOutput_3.setText(self.last_wms_requests[layer_name_lower])
+                else:
+                    # Show message to pan/zoom
+                    self.textOutput_3.setText("Please pan or zoom to trigger a request. Then press Get BBOX button again.")
 
