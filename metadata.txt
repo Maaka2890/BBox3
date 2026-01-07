@@ -6,9 +6,9 @@
 name=BoundingBox
 qgisMinimumVersion=3.2
 description=This plugin returns the xmin, ymin, xmax, ymax of the current view window, and the GetMap request of the selected WMS.
-version=2.1
+version=2.2
 author=Maaka2890
-email=kkj_15@hotmail.com
+email=kkj_15 at hotmail dot com
 
 about=Developers of web services often need bounding boxes of specific areas during trouble shooting, for test calls or for communication. The goal of this plugin is to, with one click, provide the bounding box of the current view window and the GetMap request of the selected WMS. You can copy this for your tests. With this plugin you can pan to a new location and press "Get BBOX" to updated the bounding box and GetMap request. Making it the quickest way of getting the needed information. No more need for different software, python commands, or copying xmin, ymin etc. one by one. Your bounding box is only 2 clicks away. Note that, in this plugin, the order will be xmin, ymin, xmax, ymax. This corresponds to the gml simple features point geometry encoding. Depending on the EPSG code you might need ymin, xmin, ymax, xmax in your tests. The GetMap request only works if you use the U.S. English Qgis. The script searches metadata therms which, when translated, can't be found.
 
@@ -45,3 +45,5 @@ Category of the plugin: Raster, Vector, Database or Web
 # If the plugin can run on QGIS Server.
 server=False
 
+# Added by Qt5 to Qt6 migration script
+supportsQt6=True
